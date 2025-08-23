@@ -3242,6 +3242,39 @@ public sealed partial class PInvokeGenerator : IDisposable
         return remappedName;
     }
 
+    private static int GetAnonymousRecordIndex(RecordDecl recordDecl, RecordDecl parentRecordDecl)
+    {
+        var index = -1;
+        var parentAnonRecordCount = parentRecordDecl.AnonymousRecords.Count;
+
+        if (parentAnonRecordCount != 0)
+        {
+            index = parentRecordDecl.AnonymousRecords.IndexOf(recordDecl);
+            Debug.Assert(index >= 0);
+
+            if (parentAnonRecordCount > 1)
+            {
+                index++;
+            }
+
+            if (parentRecordDecl.Parent is RecordDecl grandParentRecordDecl)
+            {
+                var parentIndex = GetAnonymousRecordIndex(parentRecordDecl, grandParentRecordDecl);
+
+                if ((parentIndex == index) || ((parentIndex != 0) && (index > parentIndex)))
+                {
+                    // We can't have the nested anonymous record have the same name as the parent
+                    // so skip that index and just go one higher instead. This could still conflict
+                    // with another anonymous record at a different level, but that is less likely
+                    // and will still be unambiguous in total.
+                    index++;
+                }
+            }
+        }
+
+        return index;
+    }
+
     private string GetRemappedNameForAnonymousRecord(RecordDecl recordDecl)
     {
         if (recordDecl.Parent is RecordDecl parentRecordDecl)
@@ -3258,28 +3291,11 @@ public sealed partial class PInvokeGenerator : IDisposable
             {
                 _ = remappedNameBuilder.Append("_Anonymous");
 
-                // If there is more than one anonymous type, then add a numeral to differentiate.
-                if (parentRecordDecl.AnonymousRecords.Count > 1)
-                {
-                    var index = parentRecordDecl.AnonymousRecords.IndexOf(recordDecl) + 1;
-                    Debug.Assert(index > 0);
-                    _ = remappedNameBuilder.Append(index);
-                }
+                var index = GetAnonymousRecordIndex(recordDecl, parentRecordDecl);
 
-                // C# doesn't allow a nested type to have the same name as the parent, so if the
-                // parent is also anonymous, add the nesting depth as a way to avoid conflicts with
-                // the parent's name.
-                if (parentRecordDecl.IsAnonymous)
+                if (index != 0)
                 {
-                    var depth = 1;
-                    var currentParent = parentRecordDecl.Parent;
-                    while ((currentParent is RecordDecl currentParentRecordDecl) && currentParentRecordDecl.IsAnonymous)
-                    {
-                        depth++;
-                        currentParent = currentParentRecordDecl.Parent;
-                    }
-                    _ = remappedNameBuilder.Append('_');
-                    _ = remappedNameBuilder.Append(depth);
+                    _ = remappedNameBuilder.Append(index);
                 }
             }
 
