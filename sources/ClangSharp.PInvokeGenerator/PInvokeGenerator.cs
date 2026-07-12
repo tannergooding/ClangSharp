@@ -4391,7 +4391,7 @@ public sealed partial class PInvokeGenerator : IDisposable
 
                     if (alignment64 < 4)
                     {
-                        alignment64 = Math.Max(Math.Min(alignment32, 8), 1);
+                        alignment64 = Math.Max(Math.Min(alignment64, 8), 1);
                     }
 
                     maxFieldSize32 = Math.Max(maxFieldSize32, 4);
@@ -4705,7 +4705,7 @@ public sealed partial class PInvokeGenerator : IDisposable
 
     private bool HasVtbl(CXXRecordDecl cxxRecordDecl, out bool hasBaseVtbl)
     {
-        var hasVtbl = cxxRecordDecl.Methods.Any((method) => method.IsVirtual && method.IsVirtual && (method.OverriddenMethods.Count == 0));
+        var hasVtbl = cxxRecordDecl.Methods.Any((method) => method.IsVirtual && (method.OverriddenMethods.Count == 0));
         hasBaseVtbl = false;
 
         if (!hasVtbl)
