@@ -86,6 +86,7 @@ internal static partial class Program
         var withAttributeNameValuePairs = s_withAttributeNameValuePairs.GetValues();
         var withCallConvNameValuePairs = s_withCallConvNameValuePairs.GetValues();
         var withClassNameValuePairs = s_withClassNameValuePairs.GetValues();
+        var withEqualities = s_withEqualities.GetValues();
         var withGuidNameValuePairs = s_withGuidNameValuePairs.GetValues();
         var withLengthNameValuePairs = s_withLengthNameValuePairs.GetValues();
         var withLibraryPathNameValuePairs = s_withLibraryPathNameValuePairs.GetValues();
@@ -425,12 +426,6 @@ internal static partial class Program
                     break;
                 }
 
-                case "generate-equality-methods":
-                {
-                    configOptions |= PInvokeGeneratorConfigurationOptions.GenerateEqualityMethods;
-                    break;
-                }
-
                 case "generate-helper-types":
                 {
                     configOptions |= PInvokeGeneratorConfigurationOptions.GenerateHelperTypes;
@@ -602,6 +597,7 @@ internal static partial class Program
                 WithAttributes = withAttributes,
                 WithCallConvs = withCallConvs,
                 WithClasses = withClasses,
+                WithEqualities = withEqualities,
                 WithGuids = withGuids,
                 WithLengths = withLengths,
                 WithLibraryPaths = withLibraryPaths,
